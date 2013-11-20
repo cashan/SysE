@@ -126,4 +126,4 @@ DListRet dlist_delete(DList* thiz, size_t index)
 	return DLIST_RET_OK;
 }
 
-DlistRet 
+DlistRet  dlist_print();
