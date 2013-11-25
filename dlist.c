@@ -1,9 +1,14 @@
+#include <stdlib.h>
+#include "dlist.h"
+
+
 typedef struct _DListNode {
 	struct _DListNode* prev;
 	struct _DListNode* next;
 
 	void *data;
 }DListNode;
+
 struct _DList {
 	DListNode* first;
 };
@@ -18,6 +23,8 @@ static DListNode* dlist_node_create(void* data){
 	}
 	return node;
 }
+
+
 static void dlist_node_destroy(DListNode* node){
 	if(node != NULL){
 		node->prev = NULL;
@@ -126,3 +133,68 @@ DListRet dlist_delete(DList* thiz, size_t index)
 	return DLIST_RET_OK;
 }
 
+DListRet dlist_get_by_index(DList* thiz, size_t index, void** data)
+{
+	DListNode* cursor = dlist_get_node(thiz, index, 0);
+	if (cursor != NULL)
+	{
+		*data = cursor->data;
+	}
+
+	return cursor != NULL ? DLIST_RET_OK : DLIST_RET_FAIL;
+}
+
+DListRet dlist_set_by_index(DList* thiz, size_t index, void* data)
+{
+	DListNode* cursor = dlist_get_node(thiz, index, 0);
+
+	if (cursor != NULL)
+	{
+		cursor->data = data;
+	}
+
+	return cursor != NULL ? DLIST_RET_OK : DLIST_RET_FAIL;
+}
+
+size_t dlist_length(DList* thiz)
+{
+	size_t length = 0;
+	DListNode* iter = thiz->first;
+
+	while(iter != NULL)
+	{
+		length++;
+		iter = iter->next;
+	}
+
+	return length;
+}
+
+DListRet dlist_print(DList* thiz, DListDataPrintFunc print)
+{
+	DListNode* iter = thiz->first;
+	while(iter != NULL)
+	{
+		print(iter->data);
+		iter = iter->next;
+	}
+
+	return DLIST_RET_OK;
+}
+
+void dlist_destroy(DList* thiz)
+{
+	DListNode* iter = thiz->first;
+	DListNode* next = NULL;
+
+	while(iter != NULL)
+	{
+		next = iter->next;
+		dlist_node_destroy(iter);
+		iter = next;
+	}
+	thiz->first = NULL;
+	free(thiz);
+	
+	return;
+}
